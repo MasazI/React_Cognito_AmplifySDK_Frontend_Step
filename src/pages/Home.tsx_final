@@ -1,0 +1,57 @@
+import React, { useEffect, useState } from 'react'
+import { API, Auth } from 'aws-amplify'
+import { CognitoUserAmplify } from '@aws-amplify/ui';
+import '@aws-amplify/ui-react/styles.css';
+
+type SampleDataType = [
+  {
+    id: string;
+    name: string;
+  }
+];
+const initialSampleData = {id: "", name: ""};
+
+type HomeProps = {
+  signOut: VoidFunction;
+  user: CognitoUserAmplify;
+};
+
+const Home: React.FC<HomeProps> = (props) => {
+  const [sampleData, setSampleData] = useState<SampleDataType>([initialSampleData])
+
+  useEffect(() => {
+    getSampleData()
+  }, [])
+
+  async function getSampleData() {
+    try {
+      const apiName = 'MainApi';
+      const path = '/';
+      const myInit = {
+        headers: { 
+          Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`,
+        },
+      };
+    
+      const data = await API.get(apiName, path, myInit);
+      setSampleData(data)
+    } catch (err) { console.log('error getting data') }
+  }
+
+  return (
+    <div className="App">
+      <p>ようこそ、 {props.user.username} さん！ Cognitoハンズオンへ。</p>
+      <p>登録データ一覧はこちらです</p>
+      {
+        sampleData.map((data, index) => (
+          <div key={data.id ? data.id : index}>
+            <p>{data.name}</p>
+          </div>
+        ))
+      }
+      <button onClick={props.signOut}>サインアウト</button>
+    </div>
+  );
+}
+
+export default Home;

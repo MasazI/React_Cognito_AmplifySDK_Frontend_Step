@@ -1,0 +1,22 @@
+import React from 'react';
+import { I18n } from 'aws-amplify'
+import { Authenticator, translations } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+
+import './App.css';
+import Home from './pages/Home';
+
+I18n.putVocabularies(translations);
+I18n.setLanguage('ja');
+
+function App() {
+  return (
+    <Authenticator signUpAttributes={['email']}>
+      {({ signOut, user }) => (
+        <Home signOut={signOut!} user={user!} />
+      )}
+    </Authenticator>
+  );
+}
+
+export default App;
